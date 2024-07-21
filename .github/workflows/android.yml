@@ -1,7 +1,12 @@
-name: Android CI
+name: Build APK
 
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
 
 jobs:
   build:
@@ -28,15 +33,25 @@ jobs:
     - name: Install NDK
       run: |
         sudo mkdir -p $ANDROID_HOME/ndk/
-        sudo wget -q https://dl.google.com/android/repository/android-ndk-r27-linux.zip -O android-ndk-r27.zip
-        sudo unzip -q android-ndk-r27.zip -d $ANDROID_HOME/ndk/
-        sudo mv $ANDROID_HOME/ndk/android-ndk-r27 $ANDROID_HOME/ndk/27.0.0
+        sudo wget -q https://dl.google.com/android/repository/android-ndk-r26c-linux.zip -O android-ndk-r26c-linux.zip
+        sudo unzip -q android-ndk-r26c-linux.zip -d $ANDROID_HOME/ndk/
+        sudo mv $ANDROID_HOME/ndk/android-ndk-r26c $ANDROID_HOME/ndk/26.2.11394342
 
     - name: Prepare local.properties
-      run: echo "ndk.dir=$ANDROID_HOME/ndk/27.0.0" > $GITHUB_WORKSPACE/local.properties
+      run: echo "ndk.dir=$ANDROID_HOME/ndk/26.2.11394342" > $GITHUB_WORKSPACE/local.properties
 
-    - name: Build with Gradle
-      run: ./gradlew build
+    - name: release apk sign
+      run: |
+        echo "给apk增加签名"
+        #cp $GITHUB_WORKSPACE/.github/workflows/android.keystore $GITHUB_WORKSPACE/app/android.keystore
+        wget https://github.com/xuexiangjys/XUpdate/raw/master/.github/workflows/android.keystore -O $GITHUB_WORKSPACE/.github/workflows/android.keystore
+        sed '$a\RELEASE_STORE_FILE=./android.keystore'          $GITHUB_WORKSPACE/gradle.properties -i
+      
+    - name: build with gradle
+      run: |
+         echo "开始进行release构建"
+         chmod +x gradlew
+         ./gradlew app:assemble
 
     - name: Upload artifact
       uses: actions/upload-artifact@v2
