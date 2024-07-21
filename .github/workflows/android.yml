@@ -35,10 +35,10 @@ jobs:
         sudo mkdir -p $ANDROID_HOME/ndk/
         sudo wget -q https://dl.google.com/android/repository/android-ndk-r21d-linux-x86_64.zip -O android-ndk-r21d.zip
         sudo unzip -q android-ndk-r21d.zip -d $ANDROID_HOME/ndk/
-        sudo mv $ANDROID_HOME/ndk/android-ndk-r21d $ANDROID_HOME/ndk/21.3.6528147
+        sudo mv $ANDROID_HOME/ndk/android-ndk-r21d $ANDROID_HOME/ndk/26.2.11394342
 
     - name: Prepare local.properties
-      run: echo "ndk.dir=$ANDROID_HOME/ndk/21.3.6528147" > $GITHUB_WORKSPACE/local.properties
+      run: echo "ndk.dir=$ANDROID_HOME/ndk/26.2.11394342" > $GITHUB_WORKSPACE/local.properties
 
     - name: Build with Gradle
       run: ./gradlew build
